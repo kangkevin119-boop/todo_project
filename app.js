@@ -5,7 +5,9 @@
 // ===== State =====
 let currentDate = new Date();
 let selectedDate = null;
-let tasks = loadTasks();
+let currentTheme = null;
+let tasks = {};
+let dismissedAdDate = null;
 let notificationTimers = new Map();
 let currentViewMode = null;
 let taskViewDate = new Date();
@@ -79,14 +81,20 @@ const greetings = [
 ];
 
 // ===== Dark Mode =====
+function getPreferredTheme() {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? 'dark' : 'light';
+}
+
 function loadTheme() {
-  return localStorage.getItem('alliTheme') || 'light';
+  if (!currentTheme) currentTheme = getPreferredTheme();
+  return currentTheme;
 }
 
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
-  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-  localStorage.setItem('alliTheme', theme);
+  currentTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'dark' : '');
+  themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
 }
 
 function toggleTheme() {
@@ -94,18 +102,9 @@ function toggleTheme() {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
-// ===== Local Storage =====
-function loadTasks() {
-  try {
-    const data = localStorage.getItem('alliTasks');
-    return data ? JSON.parse(data) : {};
-  } catch {
-    return {};
-  }
-}
-
+// ===== In-Memory Data =====
 function saveTasks() {
-  localStorage.setItem('alliTasks', JSON.stringify(tasks));
+  // Tasks intentionally stay in memory only for the active page session.
 }
 
 function getDateKey(date) {
@@ -825,9 +824,7 @@ function checkDueNotifications() {
 
 // ===== Popup Ad =====
 function shouldShowAdPopup() {
-  const dismissed = localStorage.getItem('adDismissDate');
-  if (dismissed === getDateKey(new Date())) return false;
-  return true;
+  return dismissedAdDate !== getDateKey(new Date());
 }
 
 function showAdPopup() {
@@ -838,7 +835,7 @@ function showAdPopup() {
 function closeAdPopupModal() {
   adPopupOverlay.hidden = true;
   if (adDismissToday.checked) {
-    localStorage.setItem('adDismissDate', getDateKey(new Date()));
+    dismissedAdDate = getDateKey(new Date());
   }
 }
 
