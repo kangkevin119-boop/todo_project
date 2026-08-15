@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>알리 할일 - 친근한 악어와 함께하는 할일관리</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page-layout">
+    <!-- 왼쪽 광고 영역 -->
+    <aside class="ad-sidebar ad-left" id="adLeft">
+      <div class="ad-slot" data-ad-slot="left-banner">
+        <span class="ad-label">AD</span>
+        <div class="ad-placeholder">
+          <p class="ad-title">광고 영역</p>
+          <p class="ad-desc">300 × 600</p>
+          <a href="#" class="ad-link" data-ad-link="left">광고 등록하기</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 메인 앱 -->
+    <div class="app">
+      <header class="header">
+        <div class="mascot-area">
+          <div class="alligator" aria-hidden="true">
+            <div class="gator-body">
+              <div class="gator-head">
+                <div class="gator-eye left"></div>
+                <div class="gator-eye right"></div>
+                <div class="gator-snout">
+                  <div class="gator-nostril left"></div>
+                  <div class="gator-nostril right"></div>
+                </div>
+                <div class="gator-smile"></div>
+                <div class="gator-cheek left"></div>
+                <div class="gator-cheek right"></div>
+              </div>
+              <div class="gator-belly"></div>
+              <div class="gator-tail"></div>
+              <div class="gator-arm left"></div>
+              <div class="gator-arm right"></div>
+            </div>
+          </div>
+          <div class="mascot-speech">
+            <p class="greeting" id="greeting">안녕! 나는 알리야 🐊</p>
+            <p class="sub-greeting" id="subGreeting">오늘도 함께 할일을 관리해볼까?</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-icon" id="darkModeBtn" title="다크모드">
+            <span class="theme-icon" id="themeIcon">🌙</span>
+          </button>
+          <button class="btn btn-icon" id="notifBtn" title="알림 설정">
+            <span class="notif-icon">🔔</span>
+            <span class="notif-badge" id="notifBadge" hidden>!</span>
+          </button>
+        </div>
+      </header>
+
+      <nav class="calendar-nav">
+        <button class="btn btn-nav" id="prevMonth" aria-label="이전 달">◀</button>
+        <h2 class="current-month" id="currentMonth">2026년 8월</h2>
+        <button class="btn btn-nav" id="nextMonth" aria-label="다음 달">▶</button>
+        <div class="day-nav">
+          <button class="btn btn-day" id="yesterdayBtn">어제</button>
+          <button class="btn btn-day btn-day-today" id="todayBtn">오늘</button>
+          <button class="btn btn-day" id="tomorrowBtn">내일</button>
+        </div>
+      </nav>
+
+      <div class="weekdays">
+        <span class="weekday sun">일</span>
+        <span class="weekday">월</span>
+        <span class="weekday">화</span>
+        <span class="weekday">수</span>
+        <span class="weekday">목</span>
+        <span class="weekday">금</span>
+        <span class="weekday sat">토</span>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <section class="today-preview" id="todayPreview">
+        <h3>📋 오늘의 할일</h3>
+        <ul class="task-list task-list-truncate" id="todayTaskList"></ul>
+        <div class="view-toggle">
+          <button class="btn btn-view" id="listViewBtn" data-view="list">📋 목록으로 보기</button>
+          <button class="btn btn-view" id="calendarViewBtn" data-view="calendar">📅 달력으로 보기</button>
+        </div>
+      </section>
+
+      <!-- 할일 보기 패널 (목록 / 달력) -->
+      <section class="task-view-panel" id="taskViewPanel" hidden>
+        <div class="task-view-header">
+          <h3 id="taskViewTitle">전체 할일 목록</h3>
+          <nav class="task-view-nav" id="taskViewNav" hidden>
+            <button class="btn btn-nav" id="prevTaskViewMonth" aria-label="이전 달">◀</button>
+            <span class="task-view-month" id="taskViewMonth"></span>
+            <button class="btn btn-nav" id="nextTaskViewMonth" aria-label="다음 달">▶</button>
+          </nav>
+        </div>
+        <div class="list-filter" id="listFilter" hidden>
+          <button class="btn btn-filter active" data-filter="all">전체</button>
+          <button class="btn btn-filter" data-filter="completed">완료</button>
+          <button class="btn btn-filter" data-filter="incomplete">미완료</button>
+        </div>
+        <div class="task-view-content" id="taskViewContent"></div>
+      </section>
+    </div>
+
+    <!-- 오른쪽 광고 영역 -->
+    <aside class="ad-sidebar ad-right" id="adRight">
+      <div class="ad-slot ad-slot-image" data-ad-slot="right-banner">
+        <span class="ad-label">AD</span>
+        <a href="#" class="ad-image-link" data-ad-link="right" title="광고">
+          <img src="assets/images/ad-right.png" alt="피카츄 광고">
+        </a>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 할일 추가/수정 모달 -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">할일 추가</h3>
+        <button class="btn btn-close" id="closeModal" aria-label="닫기">✕</button>
+      </div>
+      <p class="modal-date" id="modalDate"></p>
+      <form id="taskForm">
+        <div class="form-group">
+          <label for="taskTime">⏰ 시간</label>
+          <input type="time" id="taskTime" required>
+        </div>
+        <div class="form-group">
+          <label for="taskContent">📝 내용</label>
+          <textarea id="taskContent" rows="3" placeholder="할일 내용을 입력하세요" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+      <div class="modal-tasks">
+        <h4>이 날의 할일</h4>
+        <ul class="task-list task-list-truncate" id="modalTaskList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 할일 상세 보기 모달 -->
+  <div class="modal-overlay" id="taskDetailOverlay" hidden>
+    <div class="modal modal-small" role="dialog" aria-labelledby="taskDetailTitle">
+      <div class="modal-header">
+        <h3 id="taskDetailTitle">할일 상세</h3>
+        <button class="btn btn-close" id="closeTaskDetail" aria-label="닫기">✕</button>
+      </div>
+      <div class="task-detail-body">
+        <p class="task-detail-time" id="taskDetailTime"></p>
+        <p class="task-detail-content" id="taskDetailContent"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하루 할일 목록 모달 (달력으로 보기) -->
+  <div class="modal-overlay" id="dayListOverlay" hidden>
+    <div class="modal" role="dialog" aria-labelledby="dayListTitle">
+      <div class="modal-header">
+        <h3 id="dayListTitle">할일 목록</h3>
+        <button class="btn btn-close" id="closeDayList" aria-label="닫기">✕</button>
+      </div>
+      <p class="modal-date" id="dayListDate"></p>
+      <ul class="task-list task-list-full" id="dayListTasks"></ul>
+      <div class="day-list-actions">
+        <button class="btn btn-primary btn-block" id="dayListAddBtn">+ 할일 추가</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 알림 권한 모달 -->
+  <div class="modal-overlay" id="notifModalOverlay" hidden>
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h3>🔔 알림 설정</h3>
+        <button class="btn btn-close" id="closeNotifModal" aria-label="닫기">✕</button>
+      </div>
+      <div class="notif-content">
+        <div class="notif-mascot-mini"><span>🐊</span></div>
+        <p>알리가 설정한 시간에 알려드릴게요!</p>
+        <p class="notif-status" id="notifStatus">알림 권한을 허용해주세요.</p>
+        <button class="btn btn-primary btn-block" id="enableNotifBtn">알림 허용하기</button>
+        <button class="btn btn-secondary btn-block" id="testNotifBtn" hidden>테스트 알림 보내기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팝업 광고 -->
+  <div class="modal-overlay ad-popup-overlay" id="adPopupOverlay" hidden>
+    <div class="ad-popup" role="dialog" aria-label="팝업 광고">
+      <button class="btn btn-close ad-popup-close" id="closeAdPopup" aria-label="닫기">✕</button>
+      <span class="ad-label">AD</span>
+      <div class="ad-popup-content" id="adPopupContent">
+        <p class="ad-popup-title">🎉 특별 이벤트</p>
+        <p class="ad-popup-desc">팝업 광고를 이 영역에 등록할 수 있어요.<br>이미지, 링크, HTML 코드를 넣을 수 있습니다.</p>
+        <a href="#" class="ad-link ad-popup-link" id="adPopupLink">자세히 보기</a>
+      </div>
+      <label class="ad-popup-dismiss">
+        <input type="checkbox" id="adDismissToday"> 오늘 하루 보지 않기
+      </label>
+    </div>
+  </div>
+
+  <!-- 인앱 알림 배너 -->
+  <div class="in-app-alert" id="inAppAlert" hidden>
+    <span class="in-app-alert-icon">🔔</span>
+    <div class="in-app-alert-text">
+      <strong id="inAppAlertTitle">알리 할일 알림</strong>
+      <span id="inAppAlertBody"></span>
+    </div>
+    <button class="btn btn-close in-app-alert-close" id="closeInAppAlert">✕</button>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
